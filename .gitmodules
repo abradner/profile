@@ -1,0 +1,9 @@
+[submodule "mac/monokai.terminal"]
+	path = mac/monokai.terminal
+	url = https://github.com/stephenway/monokai.terminal.git
+[submodule "common/fonts"]
+	path = common/fonts
+	url = https://github.com/powerline/fonts.git
+[submodule "mac/osx-vm-templates"]
+	path = mac/osx-vm-templates
+	url = https://github.com/timsutton/osx-vm-templates.git
