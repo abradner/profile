@@ -10,6 +10,7 @@ defaults write com.apple.finder ShowHardDrivesOnDesktop YES;
 defaults write com.apple.finder ShowRemovableMediaOnDesktop YES;
 defaults write com.apple.finder ShowExternalHardDrivesOnDesktop YES;
 defaults write com.apple.finder AppleShowAllFiles YES; # show hidden files
+defaults write com.apple.finder QLEnableTextSelection -bool true; # Text selection in quick look
 
 defaults write com.apple.dock persistent-apps -array; # remove icons in Dock
 defaults write com.apple.dock tilesize -int 16; # smaller icon sizes in Dock

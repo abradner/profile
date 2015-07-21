@@ -54,8 +54,6 @@ brew cask install \
   mongodbpreferencepane \
   mongohub \
   osxfuse \
-  quicklook-csv \
-  quicklook-json \
   rubymine \
   sabnzbd \
   skype \
@@ -69,6 +67,18 @@ brew cask install \
   webstorm \
 ;
 
+# QuickLook Plugins
+brew cask install \
+  qlcolorcode \
+  qlstephen \
+  qlmarkdown \
+  quicklook-json \
+  qlprettypatch \
+  quicklook-csv \
+  betterzipql \
+  qlimagesize \
+  webpquicklook \
+  suspicious-package
 
 cd ..
 ## End Mac-specific stuff
