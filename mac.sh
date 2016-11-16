@@ -27,26 +27,27 @@ brew install \
   caskroom/cask/brew-cask \
   gpg \
   macvim \
-  node \
   openssl \
   postgis \
-  # postgresql
   python \
   redis \
   unrarx
   watchman \
   wget \
   youtube-dl \
-
+  \
   android-platform-tools \
   byobu \
   htop \
   iftop \
-
+  \
   aws-elasticbeanstalk \
   aws-cli \
-
 ;
+
+  # Other packages i'm no longer using
+  # node \ # replaced with nvm
+  # postgresql
 
 # Installing standard apps
 brew tap caskroom/versions;

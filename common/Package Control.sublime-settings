@@ -1,0 +1,18 @@
+{
+	"bootstrapped": true,
+	"in_process_packages":
+	[
+	],
+	"installed_packages":
+	[
+		"GitGutter",
+		"Handlebars",
+		"JavaScriptNext - ES6 Syntax",
+		"Material Theme",
+		"Package Control",
+		"Sass",
+		"SideBarEnhancements",
+		"Terminal",
+		"zz File Icons"
+	]
+}
