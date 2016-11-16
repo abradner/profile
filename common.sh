@@ -28,7 +28,7 @@ cd ..
 ./node.sh
 
 ## Ember dev
-npm install -g bower ember-cli phantomjs
+npm install -g bower ember-cli phantomjs-prebuilt
 
 ## done common stuff
 cd ..
