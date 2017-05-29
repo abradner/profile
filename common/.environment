@@ -16,11 +16,14 @@ alias nom='rm -rf node_modules tmp && npm cache clean && npm install'
 alias bom='rm -rf bower_components tmp && bower cache clean && bower install'
 alias nombom='nom && bom'
 
+alias ghcd='stack ghc -- -dynamic'
 
 alias autoproxy='autossh -M 23456 -C -D *:2001 -L *:3128:localhost:3128'
 
 alias brb='/System/Library/Frameworks/ScreenSaver.framework/Resources/ScreenSaverEngine.app/Contents/MacOS/ScreenSaverEngine'
 alias http='ruby -run -e httpd -- --port 9999 .'
+
+alias dcra='docker-compose run app'
 
 PS1='\[\033[01;33m\](\t)${debian_chroot:+($debian_chroot)}\[\033[01;34m\]\u@\h\[\033[00m\]:\[\033[01;32m\]\w\[\033[00m\]\$ '
 
