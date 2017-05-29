@@ -7,3 +7,6 @@
 [submodule "mac/osx-vm-templates"]
 	path = mac/osx-vm-templates
 	url = https://github.com/timsutton/osx-vm-templates.git
+[submodule "common/vimified"]
+	path = common/vimified
+	url = https://github.com/zaiste/vimified.git
