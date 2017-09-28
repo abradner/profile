@@ -1,0 +1,30 @@
+
+tagfordeploy() {
+  # get the branch name
+  branch_name=$(git symbolic-ref -q HEAD)
+  branch_name=${branch_name##refs/heads/}
+  branch_name=${branch_name:-HEAD}
+  
+  # change to you initials!
+  initials="aljb"
+  tag="deploy-$initials-$branch_name"
+
+  # get/set the version
+  existing=`git tag | grep $tag | tail -1`
+  version=${existing#*-v}
+  if [ "$version" == '' ]
+  then
+    version=00;
+  else
+    version=$((version+1))
+  fi
+  
+  # final tag!
+  tag="$tag-v$version"
+  
+  echo "tagging $tag ..."
+  git tag $tag
+  echo "pushing tag $tag"
+  git push origin $tag
+}
+

@@ -43,3 +43,14 @@ function net_reliability {
 }
 
 export -f net_reliability
+
+# Git
+source ~/scripts/gitstuff
+alias gco="git checkout"
+alias gbr="git checkout -b"
+alias grc="git rebase --continue"
+
+# Airtasker
+source ~/scripts/tagfordeploy
+source ~/scripts/airtasker-deploy
+source ~/scripts/feature_branches
