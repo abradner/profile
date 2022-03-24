@@ -25,7 +25,14 @@ alias http='ruby -run -e httpd -- --port 9999 .'
 
 alias dcra='docker-compose run app'
 
-PS1='\[\033[01;33m\](\t)${debian_chroot:+($debian_chroot)}\[\033[01;34m\]\u@\h\[\033[00m\]:\[\033[01;32m\]\w\[\033[00m\]\$ '
+if [ -f ~/.git-prompt.sh ]
+then
+  . ~/.git-prompt.sh
+  PS1='\[\033[01;33m\] \t$(__git_ps1 " %s") ${debian_chroot:+($debian_chroot)}\[\033[01;34m\]\u@\h\[\033[00m\]:\[\033[01;32m\]\w\[\033[00m\]\$ '
+else
+  PS1='\[\033[01;33m\](\t)${debian_chroot:+($debian_chroot)}\[\033[01;34m\]\u@\h\[\033[00m\]:\[\033[01;32m\]\w\[\033[00m\]\$ '
+fi
+
 
 export PATH=${PATH}:~/bin
 

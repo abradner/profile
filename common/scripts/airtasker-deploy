@@ -1,5 +1,0 @@
-getcreds() { `raxawscreds airtasker-$1`; }
-getami() { ~/Airtasker/deployment-utilities/bg_deploy/available.sh $1; }
-deploy() { ~/Airtasker/deployment-utilities/bg_deploy/bg_deploy.sh $1 $2 $3; }
-restartNode() { ~/Airtasker/deployment-utilities/restart_node.sh $1 $2; }
-

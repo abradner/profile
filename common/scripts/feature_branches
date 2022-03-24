@@ -1,7 +1,0 @@
-function list_feature_branches(){
-  getcreds dev
-  aws ec2 describe-instances --filters "Name=tag:environment,Values=feature-branch" "Name=instance-state-name,Values=running" --query 'Reservations[*].Instances[].[InstanceId,NetworkInterfaces[0].PrivateIpAddresses[0].PrivateDnsName,Tags]' | jq -r '. | map(.[0] as $id | .[1] as $internalUrl | .[2] | map(select( .Key == "feature-branch-id" ) .Value )[] as $feature | map(select( .Key == "destroy-me-at" ) .Value )[] as $destroyTime | map(select( .Key == "public-url" ) .Value )[] as $publicUrl |[$id, $feature, $destroyTime, $publicUrl, $internalUrl] | join(" - "))[]'
-}
-
-alias devssh='ssh -o ProxyCommand="ssh features-proxy nc -w 120 %h %p 2> /dev/null" -l ubuntu -i ~/.ssh/general-dev-2017-07-03.pem'
-
