@@ -1,0 +1,27 @@
+# usecase  os      source                                  target
+#
+# base: always applied. Zero dependencies - every tool is optional.
+base       all     bin/profile                             ~/.local/bin/profile
+base       all     zsh/zshrc                               ~/.zshrc
+base       all     zsh/zshenv                              ~/.zshenv
+base       all     starship/starship.toml                  ~/.config/starship.toml
+base       all     git/config                              ~/.config/git/config
+base       all     git/ignore                              ~/.config/git/ignore
+base       all     git/allowed_signers                     ~/.ssh/allowed_signers
+base       darwin  git/darwin.gitconfig                    ~/.config/git/os.gitconfig
+base       darwin  git/signing-1password-darwin.gitconfig  ~/.config/git/signing.gitconfig
+base       all     ssh/config                              ~/.ssh/config
+
+# dev: zsh only (zsh/dev) - oh-my-zsh dev plugins, single-letter aliases, rails helpers.
+
+# host: machines that hold long-running byobu sessions.
+host       all     byobu/backend                           ~/.byobu/backend
+host       all     byobu/color                             ~/.byobu/color
+host       all     byobu/keybindings.tmux                  ~/.byobu/keybindings.tmux
+host       all     byobu/.tmux.conf                        ~/.byobu/.tmux.conf
+host       all     byobu/status                            ~/.byobu/status
+host       all     byobu/statusrc                          ~/.byobu/statusrc
+
+# desktop: a local graphical session with 1Password.
+desktop    linux   alacritty/alacritty.toml                ~/.config/alacritty/alacritty.toml
+desktop    linux   git/signing-1password-linux.gitconfig   ~/.config/git/signing.gitconfig
