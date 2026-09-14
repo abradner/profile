@@ -6,9 +6,9 @@ $os\
 $hostname\
 [](bg:color_blue fg:color_purple)\
 $username\
-[](bg:color_green fg:color_blue)\
+[](bg:color_aqua fg:color_blue)\
 $directory\
-[](fg:color_green bg:color_yellow)\
+[](fg:color_aqua bg:color_yellow)\
 $git_branch\
 $git_status\
 [](fg:color_yellow bg:color_orange)\
@@ -22,11 +22,11 @@ $java\
 $kotlin\
 $haskell\
 $python\
-[](fg:color_orange bg:color_red)\
+[](fg:color_orange bg:color_bg3)\
 $docker_context\
 $conda\
 $pixi\
-[](fg:color_red bg:color_bg1)\
+[](fg:color_bg3 bg:color_bg1)\
 $time\
 [ ](fg:color_bg1)\
 $line_break$character"""
@@ -89,7 +89,7 @@ style = "bold bg:color_purple fg:color_fg0"
 format = '[ $ssh_symbol$hostname ]($style)'
 
 [directory]
-style = "fg:color_fg0 bg:color_green"
+style = "fg:color_fg0 bg:color_aqua"
 format = "[ $path ]($style)"
 truncation_length = 3
 truncation_symbol = "…/"
@@ -163,16 +163,16 @@ format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_orange)]($style)'
 
 [docker_context]
 symbol = ""
-style = "bg:color_red"
-format = '[[ $symbol( $context) ](fg:color_fg0 bg:color_red)]($style)'
+style = "bg:color_bg3"
+format = '[[ $symbol( $context) ](fg:#83a598 bg:color_bg3)]($style)'
 
 [conda]
-style = "bg:color_red"
-format = '[[ $symbol( $environment) ](fg:color_fg0 bg:color_red)]($style)'
+style = "bg:color_bg3"
+format = '[[ $symbol( $environment) ](fg:#83a598 bg:color_bg3)]($style)'
 
 [pixi]
-style = "bg:color_red"
-format = '[[ $symbol( $version)( $environment) ](fg:color_fg0 bg:color_red)]($style)'
+style = "bg:color_bg3"
+format = '[[ $symbol( $version)( $environment) ](fg:color_fg0 bg:color_bg3)]($style)'
 
 [time]
 disabled = false
