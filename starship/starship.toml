@@ -1,12 +1,12 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
 format = """
-[](color_orange)\
+[](color_purple)\
+$hostname\
+[](bg:color_orange fg:color_purple)\
 $os\
 $username\
-[](bg:color_purple fg:color_orange)\
-$hostname\
-[](bg:color_yellow fg:color_purple)\
+[](bg:color_yellow fg:color_orange)\
 $directory\
 [](fg:color_yellow bg:color_aqua)\
 $git_branch\
@@ -79,8 +79,9 @@ style_user = "bg:color_orange fg:color_fg0"
 style_root = "bg:color_orange fg:color_fg0"
 format = '[ $user ]($style)'
 
-# The hostname gets its own bold segment on every machine, not just over SSH:
-# every machine shares this prompt, so the host name is what tells them apart.
+# The hostname leads the prompt in its own bold segment, on every machine, not
+# just over SSH: every machine shares this prompt, so the host name is what
+# tells them apart.
 [hostname]
 ssh_only = false
 ssh_symbol = " "
