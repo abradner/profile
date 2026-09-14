@@ -1,0 +1,16 @@
+# ~/.ssh/config - a symlink into the profile repo. Holds no hosts.
+#
+# Host definitions live in ~/.ssh/config.d/*.conf: machine-local files, or
+# links from a private profile overlay. They're included first because ssh
+# uses the first value it finds for each option, so a host's own settings beat
+# the defaults below.
+Include ~/.ssh/config.d/*.conf
+
+# Route through the 1Password agent only where it's actually running.
+# Setting IdentityAgent unconditionally would hide a forwarded agent on boxes
+# without 1Password.
+Match exec "test -S ~/.1password/agent.sock"
+    IdentityAgent ~/.1password/agent.sock
+
+Match exec "test -S '%d/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock'"
+    IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"

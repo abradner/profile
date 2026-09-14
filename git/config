@@ -1,0 +1,28 @@
+# ~/.config/git/config - portable git settings, a symlink into the profile repo.
+# Git also reads ~/.gitconfig AFTER this file, so machine-specific settings
+# (and anything a provisioner writes with `git config --global`) live there and win.
+[user]
+	name = Alex Bradner
+	email = alex@bradner.net
+	# Public half of the 1Password-held signing key.
+	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKH6iTva79uc9NU6GCvwq0mryZocRSNZH8L/i2VzYgCC
+[gpg]
+	format = ssh
+[gpg "ssh"]
+	# Without this, `git log --show-signature` reports valid signatures as unverified.
+	allowedSignersFile = ~/.ssh/allowed_signers
+[commit]
+	gpgsign = true
+[tag]
+	gpgsign = true
+[init]
+	defaultBranch = main
+[pull]
+	rebase = false
+[push]
+	recurseSubmodules = check
+
+# Linked per OS / use case; git silently skips an include that doesn't exist.
+[include]
+	path = ~/.config/git/os.gitconfig
+	path = ~/.config/git/signing.gitconfig
