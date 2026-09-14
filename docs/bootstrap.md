@@ -119,9 +119,9 @@ with no errors.
 
 ## macOS
 
-> Not yet verified end to end on a Mac. The config is written for macOS
-> (stock bash 3.2 linker, Homebrew paths, the 1Password agent path), but
-> follow this with care and fix the doc where it's wrong.
+> Verified on two in-use Macs (a personal one and a corporate one) by
+> taking over their existing dotfiles. Read
+> [Adopting a machine](#adopting-a-machine-that-already-has-dotfiles) first.
 
 ### 1. Prerequisites
 - Xcode command-line tools: `xcode-select --install` (provides git).
@@ -133,23 +133,32 @@ with no errors.
 brew install starship fzf lsd prettyping bat pigz mise gitleaks \
   zsh-autosuggestions zsh-syntax-highlighting
 ```
+starship must be **newer than 1.22**: older builds warn `Unknown key` about
+modules in `starship.toml` on every prompt. An old copy in `/usr/local/bin`
+(from the install script) is shadowed by Homebrew's, because `/opt/homebrew/bin`
+comes first on PATH.
 
 ### 3. oh-my-zsh
 Same command as [Debian step 5](#5-oh-my-zsh-no-sudo), with `KEEP_ZSHRC=yes`.
 
 ### 4. Clone and link
+**Clone outside any synced folder** (Nextcloud, iCloud Drive, Dropbox). Links
+point at the real path, so a live `~/.zshrc` or `~/.ssh/config` inside a sync
+client can go missing when the client keeps files online-only or pauses sync,
+and syncing a `.git` directory between machines causes conflicts. If `~/code`
+is a symlink into one, use `~/.local/src` instead:
 ```sh
-mkdir -p ~/code
-git clone https://github.com/abradner/profile.git ~/code/profile
-~/code/profile/install.sh --dry-run
+mkdir -p ~/.local/src
+git clone https://github.com/abradner/profile.git ~/.local/src/profile
+~/.local/src/profile/install.sh --dry-run
 ```
 **Read the dry run before applying.** On a Mac that's been in use,
 `~/.zshrc`, `~/.ssh/config` and `~/.config/starship.toml` probably exist.
 Work through [Adopting a machine](#adopting-a-machine-that-already-has-dotfiles)
 first, then run:
 ```sh
-~/code/profile/install.sh
-profile enable dev host   # as appropriate; `desktop` is Linux-only today
+~/.local/src/profile/install.sh
+profile enable dev        # plus `host` if you run byobu there; `desktop` is Linux-only today
 ```
 The macOS 1Password signing and gh credential-helper includes are part of
 `base` on darwin.
@@ -158,7 +167,7 @@ The macOS 1Password signing and gh credential-helper includes are part of
 Open a new terminal:
 - The starship prompt appears, with no errors.
 - `git config --get gpg.ssh.program` points at `/Applications/1Password.app/…/op-ssh-sign`.
-- `ssh -G github.com | grep identityagent` shows the 1Password socket.
+- `ssh -G github.com | grep identityagent` shows the 1Password socket (or `SSH_AUTH_SOCK` on a corporate machine with the default-agent override).
 
 ---
 
@@ -171,6 +180,9 @@ running `install.sh` on a machine that's been in use:
 2. **`~/.ssh/config`.** Move every `Host` block into `~/.ssh/config.d/<name>.conf`, or into the private overlay if more than one machine should share it. The skeleton includes `~/.ssh/config.d/*.conf` first, so those hosts still win over its defaults.
 3. **`~/.gitconfig`.** Leave it. Git reads it after `~/.config/git/config`, so its values win. Remove any duplicates you no longer want.
 4. **Secrets in shell files** (passwords in `MAVEN_OPTS` and the like) never go in either repo. Keep them in 1Password and load them in `~/.zshrc.local` with `op read` / `op inject`.
+5. **Corporate machines.** Keep work settings in a local-only overlay directory (`links` + `ssh/config.d/` + `zsh/base/`), never pushed, registered with `profile overlay add`. Two settings keep work behaviour unchanged:
+   - If only personal hosts should use 1Password, add a last config.d file (e.g. `99-default-agent.conf`) with `Host *` / `IdentityAgent SSH_AUTH_SOCK`. Every other host then keeps the system agent, and personal hosts set the 1Password `IdentityAgent` in an earlier file.
+   - Commit signing is on in `base`. To keep work commits unsigned (or signed differently), set `commit.gpgsign=false` and `tag.gpgsign=false` in that machine's `~/.gitconfig`, which wins. The work email already in `~/.gitconfig` wins the same way.
 
 After linking, compare against the backup:
 `diff ~/.local/state/profile/backup/<timestamp>/.zshrc ~/.zshrc`.
@@ -208,4 +220,6 @@ directory with the same layout and register it the same way.
 | Commit fails with `No private key found` / signing errors | `commit.gpgsign` is on everywhere. On a machine without 1Password, forward your agent (`ssh -A`) or commit elsewhere. |
 | `pre-commit: gitleaks not found` | `mise use -g gitleaks@latest` or `brew install gitleaks`. |
 | `pre-commit: no private overlay…` | Register the overlay (above), or set `PROFILE_SKIP_DENYLIST=1` for that commit knowingly. |
+| `[WARN] (starship::config): … Unknown key` on every prompt | starship is too old for `starship.toml` (needs > 1.22). Install a current one earlier on PATH. |
+| Test shell with a throwaway `HOME` hangs | A prompt is waiting, e.g. mise asking to trust config in the current directory, which the fake HOME doesn't know about. `cd /tmp` first. |
 | Slow startup with `dev` | oh-my-zsh's kubectl/docker plugins refresh completions in the background on each start. Compare `profile disable dev` to measure. |

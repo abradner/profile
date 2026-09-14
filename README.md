@@ -20,7 +20,7 @@ with only zsh up to a full desktop.
 | Add a new dotfile or zsh fragment | [Changing things](#changing-things) |
 | Work on this repo as an agent | [AGENTS.md](AGENTS.md) as well as this file |
 
-Quickest possible start on a machine that already has git and zsh:
+Quickest possible start on a machine that already has git and zsh. Clone anywhere **outside a synced folder** (Nextcloud, iCloud and the like); `~/.local/src/profile` works where `~/code` is synced:
 ```sh
 git clone https://github.com/abradner/profile.git ~/code/profile
 ~/code/profile/install.sh --dry-run    # shows what would change
