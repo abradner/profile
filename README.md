@@ -46,6 +46,7 @@ switched on per machine, deliberately by hand:
 
 ```sh
 profile link [--dry-run]   # create/repair links for base + enabled use cases (install.sh = this)
+profile update             # git pull --ff-only this repo + overlays, then link
 profile check              # exit 1 on drift; for provisioning / doctor scripts
 profile status             # use cases, overlays, the state of every link
 profile enable dev host    # enable use cases on this machine, then link
@@ -54,6 +55,11 @@ profile overlay add <dir>  # register a private overlay repo, then link
 profile overlay remove <dir>
 profile usecases           # list use cases defined here and in overlays
 ```
+
+**Updating a machine** is `profile update`. Linked files point into the clone,
+so a content change is live the moment the pull lands: new shells pick it up,
+and running ones after `zshreload` / `exec zsh`. The link step afterwards only
+matters when the manifest gained lines.
 
 Everything is idempotent. A real file in the way is **moved** to
 `~/.local/state/profile/backup/<timestamp>/<same path>` before linking, never

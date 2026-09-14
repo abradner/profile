@@ -18,6 +18,7 @@ usage() {
 usage: profile <command> [args]
 
   link [--dry-run]        create/repair links for base + enabled use cases (default)
+  update                  git pull --ff-only this repo and every overlay, then link
   check                   report drift; exit 1 if anything is missing or wrong
   status                  show use cases, overlays and every link's state
   enable <usecase>...     enable use cases on this machine, then link
@@ -194,6 +195,36 @@ cmd_link() {
   if [ "$ERRORS" -gt 0 ]; then warn "$ERRORS error(s)"; exit 1; fi
 }
 
+# Pull every repo that is a git clone with an upstream, fast-forward only, so
+# local edits or divergence stop the update instead of creating a merge. Then
+# link, which picks up any new manifest lines. Content changes to files that are
+# already linked are live as soon as the pull lands.
+cmd_update() {
+  local repo before after
+  while IFS= read -r repo; do
+    if ! git -C "$repo" rev-parse --abbrev-ref '@{upstream}' >/dev/null 2>&1; then
+      say "  $repo: not a git clone with an upstream - skipped"
+      continue
+    fi
+    before="$(git -C "$repo" rev-parse --short HEAD)"
+    if ! git -C "$repo" pull --ff-only --quiet; then
+      warn "$repo: pull failed (local changes or diverged?) - fix it, then re-run"
+      ERRORS=$((ERRORS + 1))
+      continue
+    fi
+    after="$(git -C "$repo" rev-parse --short HEAD)"
+    if [ "$before" = "$after" ]; then
+      say "  $repo: up to date ($after)"
+    else
+      say "  $repo: $before -> $after"
+      git -C "$repo" log --format='      %h %s' "$before..$after"
+    fi
+  done < <(repos)
+  local pull_errors="$ERRORS"
+  cmd_link
+  if [ "$pull_errors" -gt 0 ]; then exit 1; fi
+}
+
 cmd_check() {
   local state
   while read -r uc src target; do
@@ -295,6 +326,7 @@ cmd="${1:-link}"
 [ $# -gt 0 ] && shift
 case "$cmd" in
   link)     cmd_link "$@" ;;
+  update)   cmd_update ;;
   check)    cmd_check ;;
   status)   cmd_status ;;
   enable)   cmd_enable "$@" ;;

@@ -4,7 +4,9 @@ format = """
 [](color_orange)\
 $os\
 $username\
-[](bg:color_yellow fg:color_orange)\
+[](bg:color_purple fg:color_orange)\
+$hostname\
+[](bg:color_yellow fg:color_purple)\
 $directory\
 [](fg:color_yellow bg:color_aqua)\
 $git_branch\
@@ -76,6 +78,14 @@ show_always = true
 style_user = "bg:color_orange fg:color_fg0"
 style_root = "bg:color_orange fg:color_fg0"
 format = '[ $user ]($style)'
+
+# The hostname gets its own bold segment on every machine, not just over SSH:
+# every machine shares this prompt, so the host name is what tells them apart.
+[hostname]
+ssh_only = false
+ssh_symbol = " "
+style = "bold bg:color_purple fg:color_fg0"
+format = '[ $ssh_symbol$hostname ]($style)'
 
 [directory]
 style = "fg:color_fg0 bg:color_yellow"
