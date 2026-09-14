@@ -1,0 +1,34 @@
+# Secret scanning for this PUBLIC repo, run by .githooks/pre-commit.
+#
+# Only generic rules live here. The list of names that must never appear
+# (domains, hostnames, employers) is itself sensitive, so it lives in the
+# private overlay as gitleaks/denylist.toml and runs as a second pass.
+title = "profile (public)"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "private-ipv4"
+description = "RFC1918 address literal"
+regex = '''\b(?:10(?:\.\d{1,3}){3}|192\.168(?:\.\d{1,3}){2}|172\.(?:1[6-9]|2\d|3[01])(?:\.\d{1,3}){2})\b'''
+
+[[rules]]
+id = "cgnat-ipv4"
+description = "CGNAT / tailnet address literal"
+regex = '''\b100\.(?:6[4-9]|[7-9]\d|1[01]\d|12[0-7])(?:\.\d{1,3}){2}\b'''
+
+[[rules]]
+id = "1password-reference"
+description = "1Password secret reference"
+regex = '''op://[^\s"'`]+'''
+
+[[rules]]
+id = "1password-service-account-token"
+description = "1Password service account token"
+regex = '''\bops_[A-Za-z0-9_\-]{20,}'''
+
+[[rules]]
+id = "credential-assignment"
+description = "password/secret/token assigned a literal value"
+regex = '''(?i)(?:password|passwd|secret|token|api[_-]?key)\w*["']?\s*[:=]\s*["']?[^\s"'$`{}()<>]{6,}'''

@@ -1,0 +1,54 @@
+#!/bin/sh
+# Refuse commits that stage secrets or private names. This repo is public:
+# the hook fails CLOSED - no scanner, no commit.
+#
+# Pass 1: .gitleaks.toml (gitleaks defaults + generic rules), always.
+# Pass 2: gitleaks/denylist.toml from a registered private overlay - named
+#         domains/hosts that can't be listed publicly. Missing overlay = refuse,
+#         unless PROFILE_SKIP_DENYLIST=1 is set for this commit.
+set -eu
+
+repo="$(git rev-parse --show-toplevel)"
+
+gitleaks="$(command -v gitleaks 2>/dev/null || true)"
+if [ -z "$gitleaks" ] && command -v mise >/dev/null 2>&1; then
+  gitleaks="$(mise which gitleaks 2>/dev/null || true)"
+fi
+if [ -z "$gitleaks" ]; then
+  echo "pre-commit: gitleaks not found - refusing to commit to a public repo." >&2
+  echo "  install: mise use -g gitleaks@latest   (or: brew install gitleaks)" >&2
+  exit 1
+fi
+
+scan() {
+  # gitleaks >= 8.19 has `git --staged`; older builds (Debian's 8.16) only
+  # `protect --staged`.
+  if "$gitleaks" git --help >/dev/null 2>&1; then
+    "$gitleaks" git --staged --redact --no-banner --exit-code 1 --config "$1" "$repo"
+  else
+    "$gitleaks" protect --staged --redact --no-banner --exit-code 1 --config "$1" --source "$repo"
+  fi
+}
+
+scan "$repo/.gitleaks.toml" || { echo "pre-commit: gitleaks found secrets (pass 1)" >&2; exit 1; }
+
+denylist=""
+overlays="${XDG_CONFIG_HOME:-$HOME/.config}/profile/overlays"
+if [ -f "$overlays" ]; then
+  while IFS= read -r dir; do
+    if [ -n "$dir" ] && [ -f "$dir/gitleaks/denylist.toml" ]; then denylist="$dir/gitleaks/denylist.toml"; break; fi
+  done < "$overlays"
+fi
+
+if [ -z "$denylist" ]; then
+  if [ "${PROFILE_SKIP_DENYLIST:-0}" = 1 ]; then
+    echo "pre-commit: WARNING no private deny list - skipped (PROFILE_SKIP_DENYLIST=1)" >&2
+    exit 0
+  fi
+  echo "pre-commit: no private overlay with gitleaks/denylist.toml registered." >&2
+  echo "  register it:  profile overlay add <path-to-profile-private>" >&2
+  echo "  or, knowingly: PROFILE_SKIP_DENYLIST=1 git commit ..." >&2
+  exit 1
+fi
+
+scan "$denylist" || { echo "pre-commit: staged changes contain a private name (pass 2: $denylist)" >&2; exit 1; }
