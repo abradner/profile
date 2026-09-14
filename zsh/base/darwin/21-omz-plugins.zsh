@@ -1,1 +1,1 @@
-plugins+=(macos brew)
+plugins+=(macos brew iterm2)
