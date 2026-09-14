@@ -1,0 +1,46 @@
+# ~/.zshrc - a symlink into the profile repo. Don't edit machine-specific
+# things here: put them in ~/.zshrc.local, which is sourced last.
+#
+# Sources every zsh/<usecase>/*.zsh and zsh/<usecase>/<os>/*.zsh for base plus
+# the use cases enabled on this machine (see `profile status`), from this repo
+# and each registered overlay. Files run in order of their FILENAME across all
+# of those directories, so a two-digit prefix decides where a fragment lands:
+#
+#   10 path/fpath   20 oh-my-zsh plugin list   40 oh-my-zsh   45 history
+#   50 aliases      55 functions               60 environment 70 tools/prompt
+#   90 autosuggestions + syntax highlighting (must stay last)
+#
+# Deliberately top-level rather than inside a function: sourcing oh-my-zsh from
+# a function makes every `typeset` in it local, which quietly breaks plugins.
+
+# ${(%):-%x} is this file as sourced (~/.zshrc); :A follows the symlink.
+typeset -g PROFILE_ROOT=${${(%):-%x}:A:h:h}
+case $OSTYPE in
+  darwin*) typeset -g PROFILE_OS=darwin ;;
+  *)       typeset -g PROFILE_OS=linux ;;
+esac
+
+_profile_state=${XDG_CONFIG_HOME:-$HOME/.config}/profile
+_profile_usecases=(base)
+[[ -r $_profile_state/usecases ]] && _profile_usecases+=(${(f)"$(<$_profile_state/usecases)"})
+_profile_repos=($PROFILE_ROOT)
+[[ -r $_profile_state/overlays ]] && _profile_repos+=(${(f)"$(<$_profile_state/overlays)"})
+_profile_usecases=(${(u)_profile_usecases:#})
+_profile_repos=(${_profile_repos:#})
+typeset -ga PROFILE_USECASES=($_profile_usecases)
+
+_profile_keyed=()
+for _profile_r in $_profile_repos; do
+  for _profile_u in $_profile_usecases; do
+    for _profile_f in $_profile_r/zsh/$_profile_u/*.zsh(N) $_profile_r/zsh/$_profile_u/$PROFILE_OS/*.zsh(N); do
+      _profile_keyed+=("${_profile_f:t}|$_profile_f")
+    done
+  done
+done
+
+for _profile_f in ${(o)_profile_keyed}; do
+  source ${_profile_f#*|}
+done
+unset _profile_state _profile_usecases _profile_repos _profile_keyed _profile_r _profile_u _profile_f
+
+[[ -r $HOME/.zshrc.local ]] && source $HOME/.zshrc.local

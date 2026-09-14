@@ -1,0 +1,15 @@
+# Run rubocop / rspec over what changed.
+alias rspec_changed="git diff-tree --no-commit-id --name-only -r HEAD | grep '_spec.rb' | xargs spring rspec"
+alias branch_changed="git diff --name-status master | cut -c3-"
+alias active_changed="git status --porcelain | cut -c4- | cut -f4 -d' '"
+alias auto_cop="grep '.rb' | xargs rubocop -a"
+alias auto_spec="grep '_spec.rb' | xargs spring rspec"
+alias bcac="branch_changed | auto_cop"
+alias bcas="branch_changed | auto_spec"
+alias acac="active_changed | auto_cop"
+alias acas="active_changed | auto_spec"
+
+alias bd="bin/dev"
+alias bmr="bundle && rake db:migrate && bd"
+alias gbmr="git pull && bmr"
+alias pryr="pry -r ./config/environment"

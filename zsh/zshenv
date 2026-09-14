@@ -1,0 +1,5 @@
+# ~/.zshenv - read by every zsh, including non-interactive `zsh -c` (scripts,
+# editors, Claude Code's Bash tool) where the `mise activate` hook in .zshrc
+# never runs. mise's shims read mise.toml at call time, so tool versions stay
+# right in those shells too. Keep this file tiny: it runs for every zsh.
+[[ -d $HOME/.local/share/mise/shims ]] && path=($HOME/.local/share/mise/shims $path)
