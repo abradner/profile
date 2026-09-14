@@ -15,6 +15,7 @@ with only zsh up to a full desktop.
 | You want to… | Go to |
 |---|---|
 | Set up a new or existing machine | [docs/bootstrap.md](docs/bootstrap.md), a step-by-step playbook with a check after every step |
+| Keep machines in step, change things, retire a machine | [Lifecycle](#lifecycle) |
 | See what's linked on this machine | `profile status` |
 | Change a dotfile | Edit it in place (it's a symlink) or in this repo, then [commit](#committing) |
 | Add a new dotfile or zsh fragment | [Changing things](#changing-things) |
@@ -56,15 +57,78 @@ profile overlay remove <dir>
 profile usecases           # list use cases defined here and in overlays
 ```
 
-**Updating a machine** is `profile update`. Linked files point into the clone,
-so a content change is live the moment the pull lands: new shells pick it up,
-and running ones after `zshreload` / `exec zsh`. The link step afterwards only
-matters when the manifest gained lines.
-
 Everything is idempotent. A real file in the way is **moved** to
 `~/.local/state/profile/backup/<timestamp>/<same path>` before linking, never
 overwritten or deleted. Choices are stored per machine in `~/.config/profile/`
 (`usecases`, `overlays`), not in the repo.
+
+## Lifecycle
+
+The whole life of a machine, in order. Each step is safe to re-run.
+
+### 1. Set up
+Follow [docs/bootstrap.md](docs/bootstrap.md): clone (outside synced folders),
+`install.sh --dry-run`, then `install.sh`, `profile enable <usecases>`, and
+`profile overlay add <dir>` if this machine gets an overlay. Finish with
+`profile check` and a **new** terminal.
+
+### 2. Change something (on any personal machine)
+1. **Edit the live file**, e.g. `~/.config/starship.toml`. It's a symlink, so you're editing the clone. starship and byobu pick changes up immediately; zsh needs `exec zsh`.
+2. **Review:** `git -C <clone> status` and `git -C <clone> diff`.
+   Tools with their own settings menus write through the links too: byobu's F9 menu and Shift-F5 status cycling both rewrite `byobu/*`. Check `git status` after using them, and `git checkout -- <file>` anything you didn't mean to keep.
+3. **Commit and push.** See [Committing](#committing): gitleaks plus the overlay's deny list, signed commits, files staged by name.
+
+New files, zsh fragments and use cases are covered in [Changing things](#changing-things).
+
+### 3. Update the other machines
+```sh
+profile update
+```
+It runs `git pull --ff-only` in this repo and every overlay that has an
+upstream, prints the commits that arrived, then runs `profile link`:
+- **Content changes** to already-linked files are live as soon as the pull lands. Open a new shell, or run `exec zsh`.
+- **New manifest lines** get linked by the link step.
+- **Overlays that aren't git clones** (a corporate machine's local overlay) are skipped.
+- **Exit 1** means a pull failed. Read git's message just above:
+  - *Authentication:* private overlays pull over SSH, so the agent must be unlocked, and 1Password may need approval on the machine's own screen. Running `profile update` from a local terminal there avoids this.
+  - *Local changes or divergence:* commit and push them, or `git stash`, then re-run. It never merges.
+
+`profile update` pulls into the clone that's running it; that's safe, because
+git replaces files rather than rewriting them in place.
+
+### 4. Check for drift
+```sh
+profile check    # "all links ok", or each broken link and exit 1
+profile link     # repairs: relinks, backs up anything in the way, fixes ssh-unfriendly permissions
+```
+A link usually breaks because something replaced it with a plain file: an
+installer (oh-my-zsh without `KEEP_ZSHRC=yes`) or a provisioner copying over it.
+Stop that tool managing the path, then `profile link`.
+
+### 5. Change what a machine is for
+```sh
+profile enable host          # add a use case
+profile disable dev          # remove its links; zsh fragments stop loading in new shells
+profile overlay add <dir>    # add an overlay
+profile overlay remove <dir> # remove its links and unregister it
+```
+
+### 6. Retire a machine, or take the profile off it
+There's no uninstall command. `base` can't be disabled, so do it by hand:
+```sh
+profile status                                   # what's linked, from where
+profile overlay remove <dir>                     # once per overlay (removes its links, including base ones)
+for uc in $(profile usecases); do [ "$uc" = base ] || profile disable "$uc"; done
+# remove the base links (each is a symlink into the clone; check before deleting)
+for f in ~/.zshrc ~/.zshenv ~/.config/starship.toml ~/.config/git/config ~/.config/git/ignore \
+         ~/.config/git/os.gitconfig ~/.config/git/signing.gitconfig ~/.ssh/config \
+         ~/.ssh/allowed_signers ~/.local/bin/profile; do [ -L "$f" ] && rm "$f"; done
+ls ~/.local/state/profile/backup/                # one directory per run that replaced files
+cp -a ~/.local/state/profile/backup/<timestamp>/. ~/   # restore that run's originals
+rm -rf ~/.config/profile                         # forget use cases and overlays
+```
+Restore from the **earliest** backup directory to get the pre-profile files.
+Later directories hold whatever a later run replaced. Remove the clones last.
 
 ## How it works
 

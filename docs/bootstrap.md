@@ -115,6 +115,9 @@ profile check && profile status
 Then open a **new** connection: it should go straight to the prompt (or byobu)
 with no errors.
 
+From here on, see the README's **Lifecycle** section: `profile update` to take
+in changes, `profile check` for drift, and how to change or retire a machine.
+
 ---
 
 ## macOS
