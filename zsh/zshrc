@@ -22,9 +22,13 @@ esac
 
 _profile_state=${XDG_CONFIG_HOME:-$HOME/.config}/profile
 _profile_usecases=(base)
-[[ -r $_profile_state/usecases ]] && _profile_usecases+=(${(f)"$(<$_profile_state/usecases)"})
 _profile_repos=($PROFILE_ROOT)
-[[ -r $_profile_state/overlays ]] && _profile_repos+=(${(f)"$(<$_profile_state/overlays)"})
+if [[ -r $_profile_state/usecases ]]; then
+  while IFS= read -r _profile_l; do _profile_usecases+=($_profile_l); done < $_profile_state/usecases
+fi
+if [[ -r $_profile_state/overlays ]]; then
+  while IFS= read -r _profile_l; do _profile_repos+=($_profile_l); done < $_profile_state/overlays
+fi
 _profile_usecases=(${(u)_profile_usecases:#})
 _profile_repos=(${_profile_repos:#})
 typeset -ga PROFILE_USECASES=($_profile_usecases)
@@ -41,6 +45,6 @@ done
 for _profile_f in ${(o)_profile_keyed}; do
   source ${_profile_f#*|}
 done
-unset _profile_state _profile_usecases _profile_repos _profile_keyed _profile_r _profile_u _profile_f
+unset _profile_state _profile_usecases _profile_repos _profile_keyed _profile_r _profile_u _profile_f _profile_l
 
 [[ -r $HOME/.zshrc.local ]] && source $HOME/.zshrc.local

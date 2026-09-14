@@ -115,6 +115,9 @@ link_one() {
   if [ ! -e "$src" ]; then
     warn "missing source $src"; ERRORS=$((ERRORS + 1)); return
   fi
+  # ssh refuses a group/world-writable config, and a umask of 002 checks files
+  # out that way. Done on every run, so re-linking also repairs a correct link.
+  if [ "$DRY_RUN" != 1 ]; then chmod go-w "$src"; fi
   if [ -L "$target" ] && [ "$(readlink "$target")" = "$src" ]; then
     return
   fi
@@ -131,9 +134,6 @@ link_one() {
   fi
   if [ -e "$target" ] || [ -L "$target" ]; then backup "$target"; fi
   mkdir -p "$(dirname "$target")"
-  # ssh refuses group/world-writable config, and a umask of 002 checks files
-  # out that way.
-  chmod go-w "$src"
   ln -s "$src" "$target"
   say "  linked $target -> $src"
 }
