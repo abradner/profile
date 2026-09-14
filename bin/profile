@@ -208,7 +208,7 @@ cmd_update() {
     fi
     before="$(git -C "$repo" rev-parse --short HEAD)"
     if ! git -C "$repo" pull --ff-only --quiet; then
-      warn "$repo: pull failed (local changes or diverged?) - fix it, then re-run"
+      warn "$repo: pull failed (see git's message above: auth, local changes or divergence) - fix it, then re-run"
       ERRORS=$((ERRORS + 1))
       continue
     fi
